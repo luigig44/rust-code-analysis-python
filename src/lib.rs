@@ -5,10 +5,9 @@ use pyo3::prelude::*;
 use pyo3::types::PyDict;
 use rust_code_analysis::{AstCallback, AstCfg, AstPayload, LANG, action, guess_language};
 
-
 use rust_code_analysis::{Callback, ParserTrait, rm_comments};
 mod metrics;
-use metrics::{metrics_rust, MetricsPayload, MetricsResponse};
+use metrics::{MetricsPayload, MetricsResponse, metrics_rust};
 /// Unit structure to implement the `Callback` trait.
 #[derive(Debug)]
 pub struct CommentRemoval;
@@ -22,7 +21,6 @@ impl Callback for CommentRemoval {
     }
 }
 
-
 #[pyfunction]
 fn comment_removal(file_name: String, code: String) -> PyResult<String> {
     let path = PathBuf::from(file_name);
@@ -34,15 +32,13 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
         } else {
             language
         };
-        action::<CommentRemoval>(
-            &language,
-            buf,
-            &PathBuf::from(""),
-            None,
-            (),
-        ).ok_or_else(|| PyErr::new::<pyo3::exceptions::PyValueError, _>("Failed to remove comments"))
+        action::<CommentRemoval>(&language, buf, &PathBuf::from(""), None, ()).ok_or_else(|| {
+            PyErr::new::<pyo3::exceptions::PyValueError, _>("Failed to remove comments")
+        })
     } else {
-        Err(PyErr::new::<pyo3::exceptions::PyValueError, _>("Invalid language"))
+        Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+            "Invalid language",
+        ))
     }
 }
 
@@ -55,19 +51,22 @@ fn metrics_py(file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>
         unit,
     };
     let response = metrics_rust(payload);
-    Python::with_gil(|py| {
-        response.map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.error))
-        .and_then(|response| {
-            match response.spaces {
-                None => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>("Failed to compute metrics")),
-                Some(_) => Ok(response)
-            }
-        }).and_then(|response| {
-            pythonize::pythonize(py, &response)
-                .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))
-                .map(|v| v.into())
+
+    response
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.error)) // Unknown language
+        .and_then(|response| match response.spaces {
+            None => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
+                "Failed to compute metrics",
+            )),
+            Some(_) => Ok(response),
         })
-    })
+        .and_then(|response| {
+            Python::with_gil(|py| {
+                pythonize::pythonize(py, &response)
+                    .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))
+                    .map(|v| v.into())
+            })
+        })
 }
 
 /// A Python module implemented in Rust.
