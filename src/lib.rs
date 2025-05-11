@@ -2,11 +2,13 @@ use std::path::PathBuf;
 
 use pyo3::prelude::*;
 
+use pyo3::types::PyDict;
 use rust_code_analysis::{AstCallback, AstCfg, AstPayload, LANG, action, guess_language};
 
 
 use rust_code_analysis::{Callback, ParserTrait, rm_comments};
-
+mod metrics;
+use metrics::{metrics_rust, MetricsPayload, MetricsResponse};
 /// Unit structure to implement the `Callback` trait.
 #[derive(Debug)]
 pub struct CommentRemoval;
@@ -44,18 +46,34 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
     }
 }
 
-
-
-/// Formats the sum of two numbers as string.
 #[pyfunction]
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
+fn metrics_py(file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
+    let payload = MetricsPayload {
+        id: "1".to_string(),
+        file_name,
+        code,
+        unit,
+    };
+    let response = metrics_rust(payload);
+    Python::with_gil(|py| {
+        response.map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.error))
+        .and_then(|response| {
+            match response.spaces {
+                None => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>("Failed to compute metrics")),
+                Some(_) => Ok(response)
+            }
+        }).and_then(|response| {
+            pythonize::pythonize(py, &response)
+                .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))
+                .map(|v| v.into())
+        })
+    })
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn rust_code_analysis_python(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
     m.add_function(wrap_pyfunction!(comment_removal, m)?)?;
+    m.add_function(wrap_pyfunction!(metrics_py, m)?)?;
     Ok(())
 }

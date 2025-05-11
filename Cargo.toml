@@ -10,4 +10,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 pyo3 = "0.24.0"
+pythonize = "0.24.0"
 rust-code-analysis = { git = "https://github.com/mozilla/rust-code-analysis", branch = "master" }
+serde = "1.0"
