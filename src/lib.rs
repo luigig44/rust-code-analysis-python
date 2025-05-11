@@ -2,12 +2,11 @@ use std::path::PathBuf;
 
 use pyo3::prelude::*;
 
-use pyo3::types::PyDict;
 use rust_code_analysis::{AstCallback, AstCfg, AstPayload, LANG, action, guess_language};
 
 use rust_code_analysis::{Callback, ParserTrait, rm_comments};
 mod metrics;
-use metrics::{MetricsPayload, MetricsResponse, metrics_rust};
+use metrics::{MetricsPayload, metrics_rust};
 /// Unit structure to implement the `Callback` trait.
 #[derive(Debug)]
 pub struct CommentRemoval;
@@ -45,7 +44,6 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
 #[pyfunction]
 fn metrics_py(file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
     let payload = MetricsPayload {
-        id: "1".to_string(),
         file_name,
         code,
         unit,
@@ -53,20 +51,14 @@ fn metrics_py(file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>
     let response = metrics_rust(payload);
 
     response
-        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.error)) // Unknown language
-        .and_then(|response| match response.spaces {
-            None => Err(PyErr::new::<pyo3::exceptions::PyValueError, _>(
-                "Failed to compute metrics",
-            )),
-            Some(_) => Ok(response),
-        })
         .and_then(|response| {
             Python::with_gil(|py| {
                 pythonize::pythonize(py, &response)
-                    .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))
+                    .map_err(|e| e.to_string())
                     .map(|v| v.into())
             })
         })
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e))
 }
 
 /// A Python module implemented in Rust.
