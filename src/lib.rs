@@ -3,10 +3,10 @@ use std::path::PathBuf;
 use pyo3::prelude::*;
 
 use rust_code_analysis::{AstCallback, AstCfg, AstPayload, LANG, action, guess_language};
-
 use rust_code_analysis::{Callback, ParserTrait, rm_comments};
-mod metrics;
-use metrics::{MetricsPayload, metrics_rust};
+
+mod backend;
+use backend::metrics::{MetricsPayload, metrics_rust};
 /// Unit structure to implement the `Callback` trait.
 #[derive(Debug)]
 pub struct CommentRemoval;
