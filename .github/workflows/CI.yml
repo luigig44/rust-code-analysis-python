@@ -35,6 +35,8 @@ jobs:
           python-version: 3.x
       - name: Build wheels
         uses: PyO3/maturin-action@v1
+        env:
+          CFLAGS: "-std=gnu99"
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
@@ -45,7 +47,7 @@ jobs:
         with:
           name: wheels-linux-${{ matrix.platform.target }}
           path: dist
-
+          
   musllinux:
     runs-on: ${{ matrix.platform.runner }}
     strategy:
