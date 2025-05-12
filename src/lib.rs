@@ -1,3 +1,4 @@
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 
 mod backend;
@@ -11,7 +12,7 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
 
     response
         .map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
-        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e))
+        .map_err(PyErr::new::<PyValueError, _>)
 }
 
 #[pyfunction]
@@ -31,7 +32,7 @@ fn metrics(file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
                     .map(|v| v.into())
             })
         })
-        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e))
+        .map_err(PyErr::new::<PyValueError, _>)
 }
 
 /// A Python module implemented in Rust.

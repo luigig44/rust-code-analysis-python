@@ -21,7 +21,7 @@ impl Callback for CommentRemovalCallback {
     type Cfg = ();
 
     fn call<T: ParserTrait>(_cfg: Self::Cfg, parser: &T) -> Self::Res {
-        rm_comments(parser).map_or(Err("Failed to remove comments".to_string()), Ok)
+        rm_comments(parser).ok_or("Failed to remove comments".to_string())
     }
 }
 

@@ -45,7 +45,7 @@ impl Callback for MetricsCallback {
         } else {
             spaces
         };
-        spaces.map_or(Err("Failed to compute metrics".to_string()), Ok)
+        spaces.ok_or("Failed to compute metrics".to_string())
     }
 }
 
