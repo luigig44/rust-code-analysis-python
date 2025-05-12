@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
-use rust_code_analysis::{guess_language, metrics, Callback, FuncSpace, ParserTrait, action};
-
+use rust_code_analysis::{Callback, FuncSpace, ParserTrait, action, guess_language, metrics};
 
 /// Payload containing source code used to compute metrics.
 #[derive(Debug)]
@@ -36,7 +35,7 @@ impl Callback for MetricsCallback {
 
     fn call<T: ParserTrait>(cfg: Self::Cfg, parser: &T) -> Self::Res {
         let spaces = metrics(parser, &cfg.path);
-        let spaces =if cfg.unit {
+        let spaces = if cfg.unit {
             if let Some(mut spaces) = spaces {
                 spaces.spaces.clear();
                 Some(spaces)
@@ -50,7 +49,6 @@ impl Callback for MetricsCallback {
     }
 }
 
-
 pub fn metrics_rust(payload: MetricsPayload) -> MetricsResponse {
     let path = PathBuf::from(&payload.file_name);
     let buf = payload.code.into_bytes();
@@ -60,13 +58,7 @@ pub fn metrics_rust(payload: MetricsPayload) -> MetricsResponse {
             path,
             unit: payload.unit,
         };
-        action::<MetricsCallback>(
-            &language,
-            buf,
-            &PathBuf::from(""),
-            None,
-            cfg,
-        )
+        action::<MetricsCallback>(&language, buf, &PathBuf::from(""), None, cfg)
     } else {
         Err("The file extension doesn't correspond to a valid language".to_string())
     }

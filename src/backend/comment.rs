@@ -35,13 +35,7 @@ pub fn comment_removal_rust(payload: CommentRemovalPayload) -> CommentRemovalRes
         } else {
             language
         };
-        action::<CommentRemovalCallback>(
-            &language,
-            buf,
-            &PathBuf::from(""),
-            None,
-            ()
-        )
+        action::<CommentRemovalCallback>(&language, buf, &PathBuf::from(""), None, ())
     } else {
         Err("The file extension doesn't correspond to a valid language".to_string())
     }

@@ -1,16 +1,12 @@
 use pyo3::prelude::*;
 
 mod backend;
-use backend::metrics::{MetricsPayload, metrics_rust};
 use backend::comment::{CommentRemovalPayload, comment_removal_rust};
-
+use backend::metrics::{MetricsPayload, metrics_rust};
 
 #[pyfunction]
 fn comment_removal(file_name: String, code: String) -> PyResult<String> {
-    let payload = CommentRemovalPayload {
-        file_name,  
-        code,
-    };
+    let payload = CommentRemovalPayload { file_name, code };
     let response = comment_removal_rust(payload);
 
     response
