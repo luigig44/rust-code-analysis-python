@@ -6,17 +6,17 @@ use backend::comment::{CommentRemovalPayload, comment_removal_rust};
 use backend::metrics::{MetricsPayload, metrics_rust};
 
 /// comment_removal(file_name: str, code: str) -> str
-/// 
+///
 /// Removes comments from the provided code.
 /// Imitates the behavior of the `comment_removal` REST API endpoint of `rust-code-analysis-web`.
-/// 
+///
 /// Parameters
 /// ----------
 /// file_name : str
 ///     The name of the file being processed (used to infer the language)
 /// code : str
 ///     The source code string from which comments will be removed
-/// 
+///
 /// Returns
 /// -------
 /// A string containing the code with comments removed.
@@ -48,21 +48,21 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
 /// -------
 /// A dictionary containing the calculated metrics.
 #[pyfunction]
-fn metrics(file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
-    let payload = MetricsPayload {
-        file_name,
-        code,
-        unit,
-    };
-    let response = metrics_rust(payload);
+fn metrics(py: Python<'_>, file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
+    let response = Python::allow_threads(py, || {
+        let payload = MetricsPayload {
+            file_name,
+            code,
+            unit,
+        };
+        metrics_rust(payload)
+    });
 
     response
         .and_then(|response| {
-            Python::with_gil(|py| {
-                pythonize::pythonize(py, &response)
-                    .map_err(|e| e.to_string())
-                    .map(|v| v.into())
-            })
+            pythonize::pythonize(py, &response)
+                .map_err(|e| e.to_string())
+                .map(|v| v.into())
         })
         .map_err(PyErr::new::<PyValueError, _>)
 }
