@@ -46,7 +46,12 @@ fn remove_comments(file_name: String, code: String) -> PyResult<String> {
 /// -------
 /// A dictionary containing the calculated metrics.
 #[pyfunction]
-fn compute_metrics(py: Python<'_>, file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
+fn compute_metrics(
+    py: Python<'_>,
+    file_name: String,
+    code: String,
+    unit: bool,
+) -> PyResult<Py<PyAny>> {
     let response = Python::allow_threads(py, || {
         let payload = MetricsPayload {
             file_name,

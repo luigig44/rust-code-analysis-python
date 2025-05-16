@@ -6,7 +6,8 @@ from rust_code_analysis_python import compute_metrics
 # example extracted from rust-code-analysis-web
 example = (
     "test.py",
-    "# -*- Mode: Objective-C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-\n\ndef foo():\n    pass\n",
+    "# -*- Mode: Objective-C++; tab-width: 2; indent-tabs-mode: nil;"
+    " c-basic-offset: 2 -*-\n\ndef foo():\n    pass\n",
     {
         "kind": "unit",
         "start_line": 1,
