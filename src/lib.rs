@@ -25,9 +25,7 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
     let payload = CommentRemovalPayload { file_name, code };
     let response = comment_removal_rust(payload);
 
-    response
-        .map(|bytes| String::from_utf8_lossy(&bytes).into_owned())
-        .map_err(PyErr::new::<PyValueError, _>)
+    response.map_err(PyErr::new::<PyValueError, _>)
 }
 
 /// metrics(file_name: str, code: str, unit: bool) -> dict

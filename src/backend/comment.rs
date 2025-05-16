@@ -10,18 +10,20 @@ pub struct CommentRemovalPayload {
     pub code: String,
 }
 
-pub type CommentRemovalResponse = Result<Vec<u8>, String>;
+pub type CommentRemovalResponse = Result<String, String>;
 
 /// Unit structure to implement the `Callback` trait.
 #[derive(Debug)]
 pub struct CommentRemovalCallback;
 
 impl Callback for CommentRemovalCallback {
-    type Res = CommentRemovalResponse;
+    type Res = String;
     type Cfg = ();
 
     fn call<T: ParserTrait>(_cfg: Self::Cfg, parser: &T) -> Self::Res {
-        rm_comments(parser).ok_or("Failed to remove comments".to_string())
+        // rm_comments returns None iff no comments were found
+        let code = rm_comments(parser).unwrap_or_else(|| parser.get_code().to_vec());
+        String::from_utf8_lossy(&code).into_owned()
     }
 }
 
@@ -35,7 +37,8 @@ pub fn comment_removal_rust(payload: CommentRemovalPayload) -> CommentRemovalRes
         } else {
             language
         };
-        action::<CommentRemovalCallback>(&language, buf, &PathBuf::from(""), None, ())
+        let result = action::<CommentRemovalCallback>(&language, buf, &PathBuf::from(""), None, ());
+        Ok(result)
     } else {
         Err("The file extension doesn't correspond to a valid language".to_string())
     }
