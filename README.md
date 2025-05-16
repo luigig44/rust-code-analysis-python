@@ -11,13 +11,13 @@ pip install rust-code-analysis-python
 ## Usage
 
 ```python
-from rust_code_analysis_python import metrics, comment_removal
+from rust_code_analysis_python import compute_metrics, remove_comments
 
 # Get code metrics
-metrics_result = metrics("example.rs", code_string, unit=True)
+metrics_result = compute_metrics("example.rs", code_string, unit=True)
 
 # Remove comments from code
-code_without_comments = comment_removal("example.rs", code_string)
+code_without_comments = remove_comments("example.rs", code_string)
 ```
 
 ## License

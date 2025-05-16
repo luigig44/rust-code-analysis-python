@@ -5,10 +5,10 @@ mod backend;
 use backend::comment::{CommentRemovalPayload, comment_removal_rust};
 use backend::metrics::{MetricsPayload, metrics_rust};
 
-/// comment_removal(file_name: str, code: str) -> str
+/// remove_comments(file_name: str, code: str) -> str
 ///
 /// Removes comments from the provided code.
-/// Imitates the behavior of the `comment_removal` REST API endpoint of `rust-code-analysis-web`.
+/// Imitates the behavior of the `remove_comments` REST API endpoint of `rust-code-analysis-web`.
 ///
 /// Parameters
 /// ----------
@@ -21,14 +21,14 @@ use backend::metrics::{MetricsPayload, metrics_rust};
 /// -------
 /// A string containing the code with comments removed.
 #[pyfunction]
-fn comment_removal(file_name: String, code: String) -> PyResult<String> {
+fn remove_comments(file_name: String, code: String) -> PyResult<String> {
     let payload = CommentRemovalPayload { file_name, code };
     let response = comment_removal_rust(payload);
 
     response.map_err(PyErr::new::<PyValueError, _>)
 }
 
-/// metrics(file_name: str, code: str, unit: bool) -> dict
+/// compute_metrics(file_name: str, code: str, unit: bool) -> dict
 ///
 /// Calculates various code metrics for the provided code.
 /// Imitates the behavior of the `metrics` REST API endpoint of `rust-code-analysis-web`.
@@ -46,7 +46,7 @@ fn comment_removal(file_name: String, code: String) -> PyResult<String> {
 /// -------
 /// A dictionary containing the calculated metrics.
 #[pyfunction]
-fn metrics(py: Python<'_>, file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
+fn compute_metrics(py: Python<'_>, file_name: String, code: String, unit: bool) -> PyResult<Py<PyAny>> {
     let response = Python::allow_threads(py, || {
         let payload = MetricsPayload {
             file_name,
@@ -75,7 +75,7 @@ fn metrics(py: Python<'_>, file_name: String, code: String, unit: bool) -> PyRes
 /// * `metrics`: Calculates various code metrics
 #[pymodule]
 fn rust_code_analysis_python(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(comment_removal, m)?)?;
-    m.add_function(wrap_pyfunction!(metrics, m)?)?;
+    m.add_function(wrap_pyfunction!(remove_comments, m)?)?;
+    m.add_function(wrap_pyfunction!(compute_metrics, m)?)?;
     Ok(())
 }

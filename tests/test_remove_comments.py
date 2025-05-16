@@ -1,6 +1,6 @@
 import pytest
 
-from rust_code_analysis_python import comment_removal
+from rust_code_analysis_python import remove_comments
 
 testdata = [
     # Python (.py)
@@ -132,7 +132,7 @@ testdata = list(map(lambda row: pytest.param(*row[1:], id=row[0]), testdata))
 )
 def test_comments(filename, code_with_comments, code_without_comments):
     """Should remove comments from the code"""
-    result = comment_removal(filename, code_with_comments)
+    result = remove_comments(filename, code_with_comments)
     assert result == code_without_comments
 
 
@@ -141,7 +141,7 @@ def test_comments(filename, code_with_comments, code_without_comments):
 )
 def test_missing_comments(filename, code_with_comments, code_without_comments):
     """Should return the same code if there are no comments"""
-    result = comment_removal(filename, code_without_comments)
+    result = remove_comments(filename, code_without_comments)
     assert result == code_without_comments
 
 
@@ -151,4 +151,4 @@ def test_missing_comments(filename, code_with_comments, code_without_comments):
 def test_invalid_language(filename):
     """Should raise an error for filename of unsupported or no language"""
     with pytest.raises(ValueError, match=r"extension"):
-        comment_removal(filename, "foo")
+        remove_comments(filename, "foo")

@@ -1,7 +1,7 @@
 import pytest
 from copy import deepcopy
 
-from rust_code_analysis_python import metrics
+from rust_code_analysis_python import compute_metrics
 
 # example extracted from rust-code-analysis-web
 example = (
@@ -200,17 +200,17 @@ example = (
 
 
 @pytest.mark.parametrize("filename, code, expected", [example], ids=["py"])
-def test_metrics_shallow(filename, code, expected):
+def test_compute_metrics_shallow(filename, code, expected):
     """Should return the code metrics, but only at the topmost level"""
     expected = deepcopy(expected)
     expected["spaces"] = []
-    assert metrics(filename, code, True) == expected
+    assert compute_metrics(filename, code, True) == expected
 
 
 @pytest.mark.parametrize("filename, code, expected", [example], ids=["py"])
-def test_metrics_deep(filename, code, expected):
+def test_compute_metrics_deep(filename, code, expected):
     """Should return the metrics of the code"""
-    assert metrics(filename, code, False) == expected
+    assert compute_metrics(filename, code, False) == expected
 
 
 @pytest.mark.parametrize(
@@ -219,4 +219,4 @@ def test_metrics_deep(filename, code, expected):
 def test_invalid_language(filename):
     """Should raise an error for filename of unsupported or no language"""
     with pytest.raises(ValueError, match=r"extension"):
-        metrics(filename, "foo", True)
+        compute_metrics(filename, "foo", True)
