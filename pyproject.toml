@@ -27,3 +27,4 @@ classifiers = [
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
+exclude = [".github/**/*"]
