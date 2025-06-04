@@ -25,8 +25,8 @@ Consult docstrings for details.
 ## Developing
 
 ```bash
-# Install rust and pip install build tox
-python -m build
+# Must have rust installed
+pip install -r dev_requirements.txt
 # Run tests
 tox run
 ```
