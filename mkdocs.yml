@@ -1,0 +1,10 @@
+site_name: rust-code-analysis-python
+theme:
+  name: readthedocs
+plugins:
+  - mkdocstrings
+  - mkdocs-jupyter
+nav:
+  - index.md
+  - quick-start.ipynb
+  - reference.md

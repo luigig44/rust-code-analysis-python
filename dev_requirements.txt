@@ -1,4 +1,6 @@
 maturin
 tox
 
+-r docs/requirements.txt
+
 -e .

@@ -5,21 +5,15 @@ mod backend;
 use backend::comment::{CommentRemovalPayload, comment_removal_rust};
 use backend::metrics::{MetricsPayload, metrics_rust};
 
-/// remove_comments(file_name: str, code: str) -> str
-///
 /// Removes comments from the provided code.
 /// Imitates the behavior of the `remove_comments` REST API endpoint of `rust-code-analysis-web`.
 ///
-/// Parameters
-/// ----------
-/// file_name : str
-///     The name of the file being processed (used to infer the language)
-/// code : str
-///     The source code string from which comments will be removed
+/// Args:
+///     file_name (str): The name of the file being processed (used to infer the language)
+///     code (str): The source code string from which comments will be removed
 ///
-/// Returns
-/// -------
-/// A string containing the code with comments removed.
+/// Returns:
+///     str: A string containing the code with comments removed.
 #[pyfunction]
 fn remove_comments(file_name: String, code: String) -> PyResult<String> {
     let payload = CommentRemovalPayload { file_name, code };
@@ -27,24 +21,16 @@ fn remove_comments(file_name: String, code: String) -> PyResult<String> {
 
     response.map_err(PyErr::new::<PyValueError, _>)
 }
-
-/// compute_metrics(file_name: str, code: str, unit: bool) -> dict
-///
 /// Calculates various code metrics for the provided code.
 /// Imitates the behavior of the `metrics` REST API endpoint of `rust-code-analysis-web`.
 ///
-/// Parameters
-/// ----------
-/// file_name : str
-///     The name of the file being analyzed (used to infer the language)
-/// code : str
-///     The source code string to analyze
-/// unit : bool
-///     A boolean flag. True returns only top level metrics, False returns metrics recursively.
+/// Args:
+///     file_name (str): The name of the file being analyzed (used to infer the language)
+///     code (str): The source code string to analyze
+///     unit (bool): A boolean flag. True returns only top level metrics, False returns metrics recursively.
 ///
-/// Returns
-/// -------
-/// A dictionary containing the calculated metrics.
+/// Returns:
+///     dict: A dictionary containing the calculated metrics.
 #[pyfunction]
 fn compute_metrics(
     py: Python<'_>,
@@ -71,7 +57,6 @@ fn compute_metrics(
 }
 
 /// rust-code-analysis-python
-/// =========================
 ///
 /// Implements Python bindings for the rust-code-analysis crate.
 ///
